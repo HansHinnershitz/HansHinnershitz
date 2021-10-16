@@ -1,0 +1,42 @@
+---
+title: "Untitled"
+author: "Hans Hinnershitz"
+date: "8/8/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Nine Functions
+```{r}
+library("readxl")
+MIS510BostonHousing <- read_excel("MIS510BostonHousing.xlsx")
+dim(MIS510BostonHousing)
+head(MIS510BostonHousing)
+View(MIS510BostonHousing)
+mean(MIS510BostonHousing$CRIM)
+sd(MIS510BostonHousing$ZN)
+min(MIS510BostonHousing$INDUS)
+max(MIS510BostonHousing$AGE)
+median(MIS510BostonHousing$DIS)
+length(MIS510BostonHousing$NOX)
+```
+## Linear Regression Model
+```{r}
+MIS510BostonHousing <- MIS510BostonHousing[1:1000,]
+selected.var <- c(1-12)
+set.seed(1)
+train.index <- sample(c(1:1000),600)
+train.df <- MIS510BostonHousing[train.index,selected.var]
+valid.df <- MIS510BostonHousing[-train.index,selected.var]
+MIS510BostonHousing.lm <- lm(MEDV ~., data = train.df)
+options(scipen = 999)
+summary(MIS510BostonHousing.lm)
+```
+### Scatterplot
+```{r}
+plot(MIS510BostonHousing$LSTAT,MIS510BostonHousing$MEDV)
+abline(a = 25, b = -.438428)
+```
+

@@ -1,0 +1,34 @@
+---
+title: "Module 6 CT Option 1"
+author: "Hans Hinnershitz"
+date: "8/30/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#3-5 Association Rules
+```{r}
+library(NLP)
+library(arules)
+library(tm)
+
+fp.df <- read.csv("Coursetopics.csv")
+fp.mat <- as.matrix(fp.df)
+fp.class <- as(fp.mat, "transactions")
+arules::inspect(fp.class)
+```
+##Confidence of 0.1
+```{r}
+rules <- apriori(fp.class, parameter = list(supp = 0.01, conf = .1, target = "rules" ))
+
+arules::inspect(head(sort(rules, by = "lift"), n = 5))
+```
+##Confidence of 0.1
+```{r}
+rules <- apriori(fp.class, parameter = list(supp = 0.01, conf = .5, target = "rules" ))
+
+arules::inspect(head(sort(rules, by = "lift"), n = 5))
+```
+

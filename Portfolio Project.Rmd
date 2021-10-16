@@ -1,0 +1,66 @@
+---
+title: "MIS 510 Portfolio Project Option 1"
+author: "Hans Hinnershitz"
+date: "9/12/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Five Functions
+```{r}
+GermanCredit <- read.csv("GermanCredit.csv")
+GermanCredit <- GermanCredit[-1]
+
+mean(GermanCredit$DURATION)
+sd(GermanCredit$HISTORY)
+min(GermanCredit$AGE)
+median(GermanCredit$DURATION)
+length(GermanCredit$HISTORY)
+```
+## Split Dataset (80/20)
+```{r}
+ind <- sample(2, nrow(GermanCredit),replace=TRUE,prob=c(0.8,0.2))
+
+tdata <- GermanCredit[ind==1,]
+vdata <- GermanCredit[ind==2,]
+```
+### Logistic Regression
+```{r}
+options(scipen = 999)
+results <- glm(RESPONSE~ .,data = tdata, family = "binomial")
+
+summary(results)
+
+pred <- predict(results,vdata)
+head(pred)
+head(vdata)
+```
+#### Neural Network
+```{r}
+library(neuralnet)
+nn <- neuralnet(RESPONSE ~  ., data = GermanCredit,)
+plot(nn,rep="best")
+
+nn2 <- neuralnet(RESPONSE ~ OTHER_INSTALL+GUARANTOR+FOREIGN, data = GermanCredit)
+plot(nn2,rep="best")
+
+nn3 <- neuralnet(RESPONSE ~ OTHER_INSTALL+GUARANTOR+FOREIGN,hidden = 2, data = GermanCredit)
+plot(nn3,rep="best")
+
+nn4 <- neuralnet(RESPONSE ~ OTHER_INSTALL+GUARANTOR+FOREIGN,hidden = 3, data = GermanCredit)
+plot(nn4,rep="best")
+
+nn5 <- neuralnet(RESPONSE ~ OTHER_INSTALL, data= GermanCredit)
+plot(nn5,rep="best")
+
+nn6 <- neuralnet(RESPONSE ~ FOREIGN+GUARANTOR +RENT+PROP_UNKN_NONE, hidden=2, data=GermanCredit, threshold = 0.05)
+plot(nn6,rep="best")
+
+nn7 <- neuralnet(RESPONSE ~ FOREIGN+GUARANTOR +RENT+PROP_UNKN_NONE, hidden=2, data=GermanCredit, threshold = 0.01)
+plot(nn7,rep="best")
+```
+
+
+

@@ -1,0 +1,57 @@
+---
+title: "Untitled"
+author: "Hans Hinnershitz"
+date: "8/15/2021"
+output: word_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Nine Functions
+```{r}
+library("readxl")
+MIS510banks <- read_excel("MIS510banks.xlsx")
+dim(MIS510banks)
+head(MIS510banks)
+View(MIS510banks)
+mean(MIS510banks$Obs)
+sd(MIS510banks$`Financial Condition`)
+min(MIS510banks$`TotCap/Assets`)
+max(MIS510banks$`TotExp/Assets`)
+median(MIS510banks$`TotLns&Lses/Assets`)
+length(MIS510banks$Obs)
+```
+## Linear Regression Model
+```{r}
+MIS510banks <- MIS510banks[, -c(1)]
+MIS510banks$`Financial Condition` <- factor(MIS510banks$`Financial Condition`, levels = c(0,1), labels = c("Weak","Strong"))
+logit.reg <- glm(`Financial Condition` ~ ., data = MIS510banks, family = "binomial")
+options(scipen = 999)
+summary(logit.reg)
+```
+### Estimated Logistic Equation
+
+-686.10 - 13.71 TotCap/Assets + 3353.22 TotExp/Assets + 677.51 TotLns&Lses/Assets
+
+Based off the estimated logistic equation, having a high TotCap/Assets ratio is negatively correlated with a bank that is defined as in a weak financial condition. In other words, the higher the TotCap/Assets ratio, the more likely the bank was in a strong financial position. The opposite was true of the other two variables, where TotExp/Assets and TotLns&Lses/Assets both were positively correlated with a weak financial condition.
+
+#### Confusion Matrix
+
+```{r}
+
+logit.reg.pred <- predict(logit.reg,MIS510banks, type = "response")
+
+data.frame(actual = MIS510banks$`Financial Condition`[1:5], predicted = logit.reg.pred[1:5])
+```
+##### Lift Chart
+```{r}
+library(gains)
+MIS510banks <- read_excel("MIS510banks.xlsx")
+MIS510banks <- MIS510banks[, -c(1)]
+gain <- gains(MIS510banks$`Financial Condition`, logit.reg.pred, groups = length(logit.reg.pred))
+
+plot(c(0,gain$cume.pct.of.total*sum(MIS510banks$`Financial Condition`)) ~ c(0,gain$cume.obs), xlab="# cases" , ylab = "Cumulative", main = "", type="l")
+lines(c(0,sum(MIS510banks$`Financial Condition`))~ c(0,dim(MIS510banks)[2]), lty=2)
+
+```
+
